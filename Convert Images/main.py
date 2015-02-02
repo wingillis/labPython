@@ -31,16 +31,10 @@ def bmpOrTif(filename, files):
     :param files: list of files in this folder (list)
     :return: original file name (str)
     """
-
-    bmpIndex = files.find(filename + '.tif')
-    tifIndex = files.find(filename + '.bmp')
-    tiffIndex = files.find(filename + '.tiff')
-    if bmpIndex != -1:
-        return files[bmpIndex]
-    elif tifIndex != -1:
-        return files[tifIndex]
-    else:
-        return files[tiffIndex]
+    for f in files:
+        if f[:-4] == filename and f.endswith(('.tif', '.bmp', '.tiff')):
+            return f
+    return None
 
 
 # walks through all folders within the current directory and checks for these large files
@@ -51,18 +45,20 @@ for root, dirnames, filenames in os.walk(rootPath):
             im = Image.open(os.path.join(root, filename))
             wid, hei = im.size
             originalFile = bmpOrTif(filename[:-4], filenames)
-            im2 = Image.open(os.path.join(root, originalFile))
-            wid2, hei2 = im2.size
-            if wid/wid2 == scale or hei/hei2 == scale:
-                print('Image {0} at {1} has previously been scaled and converted to this size'.format(filename, root))
-                continue
-        if filename.endswith(('.tif,', '.bmp', '.tiff')):
+            if originalFile:
+                im2 = Image.open(os.path.join(root, originalFile))
+                wid2, hei2 = im2.size
+                if wid/wid2 == scale or hei/hei2 == scale:
+                    print('Image {0} at {1} has previously been scaled and converted to this size'.format(filename, root))
+                    continue
+        elif filename.endswith(('.tif', '.bmp', '.tiff')):
             im = Image.open(os.path.join(root, filename))
             wid, hei = im.size
             newSize = (math.floor(wid*scale), math.floor(hei * scale))
             newIm = im.resize(newSize)
             try:
                 newIm.save(os.path.join(root, filename[:-4] + '_{0}px_by_{1}px_'.format(*newSize) + '.png'))
+                print('Image {0} has been saved successfully at {1}'.format(filename, root))
             except Exception as e:
                 print('Error', e)
                 print(os.path.join(root, filename))
