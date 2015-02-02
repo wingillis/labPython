@@ -32,7 +32,7 @@ def bmpOrTif(filename, files):
     :return: original file name (str)
     """
     for f in files:
-        if f[:-4] == filename and f.endswith(('.tif', '.bmp', '.tiff')):
+        if f[:-4] == filename and f.endswith(('.tif', '.bmp', '.tiff', '.jpg', '.jpeg')):
             return f
     return None
 
@@ -51,10 +51,11 @@ for root, dirnames, filenames in os.walk(rootPath):
                 if wid/wid2 == scale or hei/hei2 == scale:
                     print('Image {0} at {1} has previously been scaled and converted to this size'.format(filename, root))
                     continue
-        elif filename.endswith(('.tif', '.bmp', '.tiff')):
+        elif filename.endswith(('.tif', '.bmp', '.tiff', '.jpg', '.jpeg')):
             im = Image.open(os.path.join(root, filename))
             wid, hei = im.size
-            newSize = (math.floor(wid*scale), math.floor(hei * scale))
+	    im = im.convert('RGB')
+            newSize = (int(math.floor(wid*scale)), int(math.floor(hei * scale)))
             newIm = im.resize(newSize)
             try:
                 newIm.save(os.path.join(root, filename[:-4] + '_{0}px_by_{1}px_'.format(*newSize) + '.png'))
