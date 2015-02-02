@@ -52,19 +52,24 @@ for root, dirnames, filenames in os.walk(rootPath):
                     print('Image {0} at {1} has previously been scaled and converted to this size'.format(filename, root))
                     continue
         elif filename.endswith(('.tif', '.bmp', '.tiff', '.jpg', '.jpeg')):
-            im = Image.open(os.path.join(root, filename))
-            wid, hei = im.size
-	    im = im.convert('RGB')
-            newSize = (int(math.floor(wid*scale)), int(math.floor(hei * scale)))
-            newIm = im.resize(newSize)
             try:
+                im = Image.open(os.path.join(root, filename))
+                wid, hei = im.size
+                im = im.convert('RGB')
+                newSize = (int(math.floor(wid*scale)), int(math.floor(hei * scale)))
+                newIm = im.resize(newSize)
                 newIm.save(os.path.join(root, filename[:-4] + '_{0}px_by_{1}px_'.format(*newSize) + '.png'))
                 print('Image {0} has been saved successfully at {1}'.format(filename, root))
             except Exception as e:
+
                 print('Error', e)
-                print(os.path.join(root, filename))
+                #print(os.path.join(root, filename))
                 print('Process aborted before fully finishing')
-                raise e
+                print('Problem happened with file {0}'.format(os.path.join(filename, root)))
+
+                # Uncomment this line if you want the program to crash and not continue running
+                # if an error occurs
+                #raise e
 
 
 print('Process finished successfully')
